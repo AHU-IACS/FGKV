@@ -758,8 +758,7 @@ void DBImpl::CompactRange(const Slice* begin, const Slice* end) {
 }
 
 ///////////////////////////////////////
-void DBImpl::PrintMyStats() { 
-  fprintf(stderr, "总写入数据量:\t %lld \n", static_cast<unsigned long long>(fg_stats_->fg_total_write));
+void DBImpl::PrintMyStats() {
 
   Slice token = "leveldb.stats";
   std::string stats;
@@ -785,12 +784,12 @@ void DBImpl::PrintMyStats() {
   fprintf(stderr, "L0Compaction次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->l0_doc_count));
   fprintf(stderr, "L0Compaction时间:\t %f \n\n", (fg_stats_->l0_doc_time * 1e-6));
 
-  fprintf(stderr, "簇Compaction次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->fg_cluster_compaction_count));
-  fprintf(stderr, "簇Compaction时间:\t %f \n\n", ((fg_stats_->fg_cluster_compaction_time -
+  fprintf(stderr, "cluster compaction次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->fg_cluster_compaction_count));
+  fprintf(stderr, "cluster compaction时间:\t %f \n\n", ((fg_stats_->fg_cluster_compaction_time -
                                       fg_stats_->minor_compaction_time_in_cluster) * 1e-6));
 
-  fprintf(stderr, "从Compaction次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->fg_patch_compaction_count));
-  fprintf(stderr, "从Compaction时间:\t %f \n\n", ((fg_stats_->fg_patch_compaction_time - 
+  fprintf(stderr, "patch compaction次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->fg_patch_compaction_count));
+  fprintf(stderr, "patch compaction时间:\t %f \n\n", ((fg_stats_->fg_patch_compaction_time - 
                                       fg_stats_->minor_compaction_time_in_patch) * 1e-6));
 
   fprintf(stderr, "Memtable Get次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->mem_get_count));
@@ -802,19 +801,6 @@ void DBImpl::PrintMyStats() {
   fprintf(stderr, "FindTable时间:\t %f \n", (fg_stats_->find_table_time * 1e-6));
   fprintf(stderr, "InternalGet次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->internal_get_count));
   fprintf(stderr, "InternalGet时间:\t %f \n", (fg_stats_->internal_get_time * 1e-6));
-  fprintf(stderr, "InternalGet中BlockReader时间:\t %f \n", (fg_stats_->internal_get_seek_data_block_time * 1e-6));
-  fprintf(stderr, "读中调用BlockReader次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_r_count));
-  fprintf(stderr, "读中调用BlockReader时间:\t %f \n", (fg_stats_->block_reader_r_time * 1e-6));
-  fprintf(stderr, "读中BlockReader中访问缓存次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_r_read_block_cache_count));
-  fprintf(stderr, "读中BlockReader中访问磁盘Block次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_r_read_block_count));
-  fprintf(stderr, "读中BlockReader中访问磁盘Block时间:\t %f \n", (fg_stats_->block_reader_r_read_block_time * 1e-6));
-  
-
-  fprintf(stderr, "写中调用BlockReader次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_w_count));
-  fprintf(stderr, "写中调用BlockReader时间:\t %f \n", (fg_stats_->block_reader_w_time * 1e-6));
-  fprintf(stderr, "写中BlockReader中访问缓存次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_w_read_block_cache_count));
-  fprintf(stderr, "写中BlockReader中访问磁盘Block次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->block_reader_w_read_block_count));
-  fprintf(stderr, "写中BlockReader中访问磁盘Block时间:\t %f \n", (fg_stats_->block_reader_w_read_block_time * 1e-6));
 
   fprintf(stderr, "WriteBlock次数:\t %lld \n", static_cast<unsigned long long>(fg_stats_->write_block_count));
   fprintf(stderr, "WriteBlock时间:\t %f \n\n", (fg_stats_->write_block_time * 1e-6));
@@ -831,13 +817,11 @@ void DBImpl::PrintMyStats() {
   for (int i = 0; i < 7; i ++){ 
     fprintf(stderr, "L%d_Compaction中写Block个数: %lld \n", i, static_cast<unsigned long long>(fg_stats_->add_block_count[i]));
   }
-  fprintf(stderr, "全选的从表个数:\t %d\n", fg_stats_->chosen_patch);
-  fprintf(stderr, "全选的从表大小:\t %lld \n", static_cast<unsigned long long>(fg_stats_->chosen_patch_size));
+  fprintf(stderr, "全选的patch个数:\t %d\n", fg_stats_->chosen_patch);
+  fprintf(stderr, "全选的patch大小:\t %lld \n", static_cast<unsigned long long>(fg_stats_->chosen_patch_size));
 
-  fprintf(stderr, "簇合并平均从表数:\t %f \n", (float)fg_stats_->total_patch_number_in_cluster_compaction / fg_stats_->fg_cluster_compaction_count);
-  fprintf(stderr, "原生簇合并数:\t %d \n", fg_stats_->original_cluster_compaction_count);
-  system("ps aux | grep db_bench");
-  system("ps aux | grep ycsbc");
+  fprintf(stderr, "cluster compaction平均patch数:\t %f \n", (float)fg_stats_->total_patch_number_in_cluster_compaction / fg_stats_->fg_cluster_compaction_count);
+  fprintf(stderr, "原生cluster compaction数:\t %d \n", fg_stats_->original_cluster_compaction_count);
 
 #ifdef OUTPUT_FILE_SIZE
   for (int i = 0; i < 7; i ++){ 
